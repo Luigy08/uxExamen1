@@ -1,0 +1,167 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>
+      <ion-item class="item item-trns text-center">
+        <pre>The Social</pre>
+        <ion-avatar item-end *ngIf="afAuth.authState | async">
+          <img src={{currentUser.photoURL}}>
+        </ion-avatar>
+        <button *ngIf="afAuth.authState | async" ion-button color="primary" item-end (click)="logout()">Logout</button>
+      </ion-item>
+    </ion-title>
+  </ion-navbar>
+  <div *ngIf="afAuth.authState | async as user; else showLogin">
+    <ion-toolbar no-border-top>
+      <ion-segment [(ngModel)]="main">
+        <ion-segment-button value="Home">
+          Home
+        </ion-segment-button>
+       
+        <ion-segment-button value="Explorer">
+          Explorer
+        </ion-segment-button>
+      </ion-segment>
+    </ion-toolbar>
+  </div>
+</ion-header>
+
+
+
+<ion-content>
+  <div [ngSwitch]="main">
+
+    <ion-item *ngSwitchCase="'Home'">
+      <div *ngIf="afAuth.authState | async as user; ">
+
+        <ion-list>
+          <ion-item *ngFor="let message of messages | async" class="itemchat">
+              <div *ngIf="message.estado==2&&message.uid==currentUser.uid||message.estado==0">
+                  <ion-card>
+                    <ion-item>
+                      <ion-avatar item-start>
+                        <img src={{message.uPhoto}}>
+                      </ion-avatar>
+                      {{message.displayName}}
+                    </ion-item>
+                    <ion-card-content>
+                      {{message.title}}
+                    </ion-card-content>
+                    <ion-row>
+                      <ion-col>
+                        <button ion-button color="primary" clear small icon-start (click)="like(message.id,message.like,message.order)">
+                          <ion-icon name='thumbs-up'></ion-icon>
+                          {{message.like}}
+                        </button>
+                      </ion-col>
+                      <ion-col>
+                        <button ion-button color="primary" clear small icon-start (click)="dislike(message.id,message.dislike)">
+                          <ion-icon name='thumbs-down'></ion-icon>
+                          {{message.dislike}}
+                        </button>
+                      </ion-col>
+                      <ion-col align-self-center text-center>
+                        <button *ngIf="message.uid==currentUser.uid" ion-button color="primary" clear small icon-start (click)="privado(message.id)">
+                          privado
+                          <ion-icon name='eye-off'></ion-icon>
+                        </button>
+                      </ion-col>
+                      <ion-col align-self-center text-center>
+                        <button *ngIf="message.uid==currentUser.uid" ion-button color="primary" clear small icon-start (click)="publico(message.id)">
+                          publico
+                          <ion-icon name='eye'></ion-icon>
+                        </button>
+                      </ion-col>
+                    </ion-row>
+                  </ion-card>
+                </div>
+
+          </ion-item>
+        </ion-list>
+        <ion-toolbar position="bottom">
+          <ion-row class="message_row">
+            <ion-col col-9>
+              <ion-item no-lines>
+                <ion-label color="primary">Message</ion-label>
+                <ion-input type="text" placeholder="message" [(ngModel)]="message"></ion-input>
+              </ion-item>
+            </ion-col>
+            <ion-col col-3>
+              <div class="buttons" item-right>
+                <button ion-fab mini (click)="addMessage()" [disabled]="message === ''">
+                  <ion-icon name="send"></ion-icon>
+                </button>
+              </div>
+            </ion-col>
+          </ion-row>
+        </ion-toolbar>
+      </div>
+    </ion-item>
+
+    
+    <ion-list *ngSwitchCase="'Explorer'">
+      <ion-item>
+        <ion-searchbar (ionInput)="getItems($event)"></ion-searchbar>
+        <ion-list>
+          <ion-item *ngFor="let user of userlist">
+            {{ user.displayName }}
+            <button ion-button color="primary">FOLLOW</button>
+            <ion-avatar item-left>
+              <img src={{user.photoURL}}>
+            </ion-avatar>
+          </ion-item>
+        </ion-list>
+      </ion-item>
+    </ion-list>
+  </div>
+</ion-content>
+<ng-template #showLogin>
+  <p>Please login.</p>
+  <button ion-button color="danger" (click)="login()" icon-right>
+    <ion-icon name="logo-googleplus">Login with Google</ion-icon>
+  </button>
+</ng-template>
+
+<!--
+<ion-content padding>
+  <div *ngIf="afAuth.authState | async as user; else showLogin">
+    <div class="main">
+      <div class="chat">
+        <ion-list>
+          <ion-item *ngFor="let message of messages | async" (click)="showOptions(message.id, message.title)" class="itemchat">
+            {{message.title}}
+            <ion-avatar item-left>
+              <img src={{message.uPhoto}}>
+            </ion-avatar>
+          </ion-item>
+        </ion-list>
+        <ion-footer>
+          <ion-toolbar>
+            <ion-row class="message_row">
+              <ion-col col-9>
+                <ion-item no-lines>
+                  <ion-label color="primary">Message</ion-label>
+                  <ion-input type="text" placeholder="message" [(ngModel)]="message"></ion-input>
+                </ion-item>
+              </ion-col>
+              <ion-col col-3>
+                <div class="buttons" item-right>
+                  <button ion-fab mini (click)="addMessage()" [disabled]="message === ''">
+                    <ion-icon name="send"></ion-icon>
+                  </button>
+                </div>
+              </ion-col>
+            </ion-row>
+          </ion-toolbar>
+        </ion-footer>
+      </div>
+
+    </div>
+  </div>
+  <ng-template #showLogin>
+    <p>Please login.</p>
+    <button ion-button color="danger" (click)="login()" icon-right>
+      <ion-icon name="logo-googleplus">Login with Google</ion-icon>
+    </button>
+  </ng-template>
+</ion-content>
+-->
